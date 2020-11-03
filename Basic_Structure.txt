@@ -1,0 +1,31 @@
+
+sub Basice_structure()
+Dim driver As SeleniumWrapper.WebDriver
+Dim ele As Object
+
+
+Set driver = New SeleniumWrapper.WebDriver
+
+
+driver.Start "chrome", "https://www.google.com"
+
+driver.setImplicitWait 5000
+driver.setTimeout 120000
+driver.windowMaximize
+
+driver.get "https://www.google.com"
+
+
+
+'Here We will apply our  logic
+
+
+
+
+
+
+'Close Chrome Browser and  CMD  Prompt 
+
+ Shell ("taskkill /im chromedriver.exe /f /t")
+
+End
