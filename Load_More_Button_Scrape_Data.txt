@@ -1,0 +1,45 @@
+Sub Load_More_Button_Scrape_data()
+
+Dim driver As SeleniumWrapper.WebDriver
+Dim ele As Object
+
+
+Set driver = New SeleniumWrapper.WebDriver
+
+
+driver.Start "chrome", "https://webscraper.io/test-sites/e-commerce/more/computers/laptops"
+
+driver.setTimeout 120000
+driver.windowMaximize
+driver.get "https://webscraper.io/test-sites/e-commerce/more/computers/laptops"
+
+
+'Here we will apply our Logic
+
+top:
+
+On Error GoTo bot
+ driver.findElementByXPath("//a[@class='btn btn-primary btn-lg btn-block ecomerce-items-scroll-more']").Click
+
+
+
+ driver.Wait (2000)
+ GoTo top
+
+
+
+bot:
+
+For Each ele In driver.findElementsByXPath("//div[@class='thumbnail']")
+   erow = Sheets("Sheet1").Cells(Rows.Count, 1).End(xlUp).Offset(1, 0).Row
+   
+   Sheets("sheet1").Cells(erow, 1) = ele.findElementByXPath(".//div[@class='caption']/h4[2]").Text
+   Sheets("sheet1").Cells(erow, 2) = ele.findElementByXPath(".//div[@class='caption']/h4[1]").Text
+Next ele
+
+
+'Close Chrome and CMD Prompt
+
+Shell ("taskkill /im chromedriver.exe /f /t")
+
+End Sub

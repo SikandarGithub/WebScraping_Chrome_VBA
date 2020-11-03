@@ -1,0 +1,51 @@
+Sub Scrape_infinite_Scrolling_pages_1()
+
+Dim driver As SeleniumWrapper.WebDriver
+Dim ele As Object
+
+
+Set driver = New SeleniumWrapper.WebDriver
+Dim keys As New SeleniumWrapper.keys
+
+driver.Start "chrome", "https://webscraper.io/test-sites/e-commerce/scroll/computers/laptops"
+driver.setImplicitWait 5000
+driver.setTimeout 120000
+driver.windowMaximize
+driver.get "https://webscraper.io/test-sites/e-commerce/scroll/computers/laptops"
+
+
+'Here we will apply our Logic
+
+top:
+
+last_h = driver.executeScript("return  document.body.scrollHeight;")
+
+driver.executeScript ("window.scrollTo(0, document.body.scrollHeight)")
+
+driver.Wait (2000)
+
+new_h = driver.executeScript("return  document.body.scrollHeight;")
+
+
+If last_h <> new_h Then GoTo top
+
+
+For Each ele In driver.findElementsByXPath("//div[@class='caption']")
+  erow = Sheets("Sheet1").Cells(Rows.Count, 1).End(xlUp).Offset(1, 0).Row
+
+  Sheets("sheet1").Cells(erow, 1) = ele.findElementByXPath(".//h4[2]").Text
+  
+  Sheets("sheet1").Cells(erow, 2) = ele.findElementByXPath(".//h4[1]").Text
+Next ele
+
+
+
+
+
+'Close Chrome and CMD Prompt
+
+Shell ("taskkill /im chromedriver.exe /f /t")
+
+
+End Sub
+

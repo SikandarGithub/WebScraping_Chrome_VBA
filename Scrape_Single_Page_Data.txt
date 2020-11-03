@@ -1,0 +1,37 @@
+
+Sub single_page_scrape_data()
+
+
+Dim driver As SeleniumWrapper.WebDriver
+Dim ele As Object
+
+
+Set driver = New SeleniumWrapper.WebDriver
+
+
+driver.Start "chrome", "http://quotes.toscrape.com/"
+
+driver.setImplicitWait 5000
+driver.setTimeout 120000
+driver.windowMaximize
+
+driver.get "http://quotes.toscrape.com/"
+
+
+
+'Here We will apply our  logic
+
+ For Each ele In driver.findElementsByXPath("//div[@class='quote']")
+    erow = Sheets("Sheet1").Cells(Rows.Count, 1).End(xlUp).Offset(1, 0).Row
+    Sheets("sheet1").Cells(erow, 1) = ele.findElementByXPath(".//span[1]").Text
+    Sheets("sheet1").Cells(erow, 2) = ele.findElementByXPath(".//span[2]").Text
+ Next ele
+
+
+
+
+'Close Chrome Browser and  CMD  Prompt
+
+ Shell ("taskkill /im chromedriver.exe /f /t")
+
+End Sub
