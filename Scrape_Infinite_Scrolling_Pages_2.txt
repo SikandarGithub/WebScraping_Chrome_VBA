@@ -23,49 +23,66 @@ driver.get "https://www.vudu.com/content/movies/uxrow/4K-UHD/74"
 
 
 'Here We will apply our  logic
-
-Count = 0
+ 
+ Count = 0
 top:
-    'wait till page fully load
+ For Each ele In driver.findElementsByXPath("//h1[@class='_32R-2 _1iZta']")
+   driver.Wait (5000)
+   Count = Count + 1
+   tm = ele.Text
+
+ Next ele
     
-    For Each ele In driver.findElementsByXPath("//h1[@class='_32R-2 _1iZta']")
-      Count = Count + 1
-      driver.wait(3000)
-    Next ele
-    
-    If Count = 0 Then GoTo top
-    
-    
-    'total number of  movies
-    
-    tm = driver.findElementByXPath("//h1[@class='_32R-2 _1iZta']").Text
-    
+If Count = 0 Then GoTo top
+
+
+
+'total number of  movies
+
+
+
     tm = Right(tm, Len(tm) - InStr(tm, "("))
-    tm = Left(tm, InStr(tm, ")"))
-    tm = Len(tm) - 1
     
+    tm = Left(tm, InStr(tm, ")") - 1)
+
+
+
+
+
     'loop to repeat scroll down
-    
+
     lp = Int(tm / 16) + 1
-    
-    For i = 1 To lp
-        
+
+
+For i = 1 To lp
+
         For Each ele In driver.findElementsByXPath("//div[@class='_1-zjZ']/a")
-             erow = Sheets("sheet1").Cells(Rows.Count, 1).End(xlUp).Offset(1, 0).Row
-             Sheets("sheet1").Cells(erow, 1) = ele.getAttribute("href")
+           erow = Sheets("sheet1").Cells(Rows.Count, 1).End(xlUp).Offset(1, 0).Row
+           Sheets("sheet1").Cells(erow, 1) = ele.getAttribute("href")
+          
         Next ele
         
-        For j = 1 To 16
-           driver.SendKeys (keys.Down)
-           
+        
+        For j = 1 To 12
+          driver.SendKeys (keys.ArrowDown)
         Next j
-       driver.Wait (5000)
-    Next i
+        driver.Wait (5000)
+    
+           
+        
 
+Next i
+
+lastrow = Sheets("Sheet1").Cells(Rows.Count, "A").End(xlUp).Row
+
+Sheets("sheet1").Range("A2:A" & lastrow).RemoveDuplicates Columns:=1
 
 'Close Chrome Browser and  CMD  Prompt
+ 
 
  Shell ("taskkill /im chromedriver.exe /f /t")
+
+
 
 End Sub
 

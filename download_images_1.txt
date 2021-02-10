@@ -1,0 +1,35 @@
+
+#If VBA7 Then
+Private Declare PtrSafe Function URLDownloadToFile Lib "urlmon" Alias "URLDownloadToFileA" ( _
+          ByVal pCaller As LongPtr, _
+          ByVal szURL As String, _
+          ByVal szFileName As String, _
+          ByVal dwReserved As LongPtr, _
+          ByVal lpfnCB As LongPtr) As LongPtr
+#Else
+Private Declare PtrSafe Function URLDownloadToFile Lib "urlmon" Alias "URLDownloadToFileA" ( _
+          ByVal pCaller As Long, _
+          ByVal szURL As String, _
+          ByVal szFileName As String, _
+          ByVal dwReserved As Long, _
+          ByVal lpfnCB As Long) As Long
+#End If
+
+Sub download_images()
+
+For i = 2 To 5
+
+ imagelink = Sheets("sheet1").Cells(i, 1).Value
+ Destination = "C:\Users\sikandar hayat\Desktop\images\" & i & ".jpg"
+
+
+ URLDownloadToFile 0, imagelink, Destination, 0, 0
+  
+ Sheets("sheet1").Cells(i, 2) = "done"
+
+Next i
+
+MsgBox "your task ready"
+
+End Sub
+
