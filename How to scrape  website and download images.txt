@@ -1,0 +1,71 @@
+#If VBA7 Then
+Private Declare PtrSafe Function URLDownloadToFile Lib "urlmon" Alias "URLDownloadToFileA" ( _
+          ByVal pCaller As LongPtr, _
+          ByVal szURL As String, _
+          ByVal szFileName As String, _
+          ByVal dwReserved As LongPtr, _
+          ByVal lpfnCB As LongPtr) As LongPtr
+#Else
+Private Declare PtrSafe Function URLDownloadToFile Lib "urlmon" Alias "URLDownloadToFileA" ( _
+          ByVal pCaller As Long, _
+          ByVal szURL As String, _
+          ByVal szFileName As String, _
+          ByVal dwReserved As Long, _
+          ByVal lpfnCB As Long) As Long
+#End If
+
+Sub books_scraping()
+        
+        Dim driver As SeleniumWrapper.WebDriver
+        Dim ele As Object
+        
+        
+        Set driver = New SeleniumWrapper.WebDriver
+        
+        
+        driver.Start "chrome", "https://books.toscrape.com/"
+        
+        driver.setImplicitWait 5000
+        driver.setTimeout 120000
+        driver.windowMaximize
+        
+        driver.get "https://books.toscrape.com/"
+        
+        
+        
+        'Here We will apply our  logic
+top:
+        For Each ele In driver.findElementsByXPath("//article[@class='product_pod']")
+              erow = Sheets("Sheet1").Cells(Rows.Count, 1).End(xlUp).Offset(1, 0).Row
+              Name = ele.findElementByXPath(".//h3/a").getAttribute("title")
+              Price = ele.findElementByXPath(".//div[@class='product_price']/p[1]").Text
+              imagelink = ele.findElementByXPath(".//div[@class='image_container']/a/img").getAttribute("src")
+              
+              Sheets("sheet1").Cells(erow, 1) = Name
+              Sheets("sheet1").Cells(erow, 2) = Price
+              Sheets("sheet1").Cells(erow, 3) = imagelink
+              
+              Destination = "C:\Users\hostw\OneDrive\Desktop\images\" & Name & ".jpg"
+               URLDownloadToFile 0, imagelink, Destination, 0, 0
+               
+               
+        Next ele
+        
+        
+       For Each ele In driver.findElementsByXPath("//li[@class='next']/a")
+        driver.get ele.getAttribute("href")
+        driver.Wait (3000)
+        GoTo top
+       
+       Next ele
+        
+        
+        
+        
+        'Close Chrome Browser and  CMD  Prompt
+        
+         Shell ("taskkill /im chromedriver.exe /f /t")
+
+
+End Sub
+
