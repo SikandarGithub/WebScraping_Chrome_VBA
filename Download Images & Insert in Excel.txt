@@ -1,0 +1,93 @@
+Sub Images_amazon_Alibaba()
+ Application.ScreenUpdating = False
+ Dim ws As Worksheet
+ Set ws = Sheets("sheet1")
+ 
+ 
+ lastrow = ws.Cells(Rows.Count, "A").End(xlUp).Row
+ 
+ If ws.Shapes.Count > 1 Then
+       Dim Sh As Shape
+       For Each Sh In ws.Shapes
+     
+         If Sh.TopLeftCell.Row > 1 Then
+            Sh.Delete
+         End If
+        Next Sh
+        For i = 2 To lastrow
+         
+        ws.Rows(i).RowHeight = 15
+     
+         
+        Next i
+ Else
+
+        
+        Dim driver As SeleniumWrapper.WebDriver
+        Dim ele As Object
+        Dim imagePath As String
+        Dim imgLeft As Integer
+        Dim imgTop As Integer
+        
+        Set driver = New SeleniumWrapper.WebDriver
+        
+        
+        driver.Start "chrome", "https://www.google.com"
+        
+        driver.setImplicitWait 5000
+        driver.setTimeout 120000
+        driver.windowMaximize
+        
+      
+        
+        For i = 2 To lastrow
+         src = ""
+          For j = 1 To 3
+                    link = ws.Cells(i, j).Value
+                    If link <> "" Then
+            
+                       driver.get link
+                     ' Amazon
+                       If j = 1 Then
+                                    For Each ele In driver.findElementsByXPath("//div[@id='imgTagWrapperId']/img")
+                                      src = ele.getAttribute("src")
+                                    Next ele
+                       Else
+                       ' Alibaba
+                                  For Each ele In driver.findElementsByXPath("//div[@class='image-zoom-container']/img")
+                                      src = ele.getAttribute("src")
+                                    Next ele
+                       End If
+                      
+                          ws.Rows(i).RowHeight = 150
+                        
+                          imagePath = src
+                          imgLeft = ws.Cells(i, j).Left
+                          imgTop = ws.Cells(i, j).top
+                          
+                      'Width & Height = -1 means keep original size
+                          ws.Shapes.AddPicture _
+                          Filename:=imagePath, _
+                          linktofile:=msoFalse, _
+                          savewithdocument:=msoTrue, _
+                          Left:=imgLeft, _
+                          top:=imgTop, _
+                          Width:=150, _
+                          Height:=150
+            
+            
+                         
+                    End If
+               j = j + 1
+            Next j
+        Next i
+      
+        
+         Shell ("taskkill /im chromedriver.exe /f /t")
+  End If
+
+   Application.ScreenUpdating = True
+End Sub
+
+
+
