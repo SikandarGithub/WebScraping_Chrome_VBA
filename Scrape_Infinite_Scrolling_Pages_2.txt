@@ -69,17 +69,10 @@ For i = 1 To lp
         Next j
         driver.Wait (5000)
     
-           
-        
-<<<<<<< HEAD
 
 Next i
 
-=======
 
-Next i
-
->>>>>>> ec6dad263bc81fbc744402867fb92c139db91ac6
 lastrow = Sheets("Sheet1").Cells(Rows.Count, "A").End(xlUp).Row
 
 Sheets("sheet1").Range("A2:A" & lastrow).RemoveDuplicates Columns:=1

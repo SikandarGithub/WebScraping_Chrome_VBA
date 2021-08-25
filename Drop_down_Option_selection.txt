@@ -1,0 +1,55 @@
+
+
+Sub Select_drop_down_Option()
+         
+Dim driver As SeleniumWrapper.WebDriver
+Dim actions As SeleniumWrapper.actions
+Dim keys  As New SeleniumWrapper.keys
+Dim ele, ele1, ele2, element As Object
+
+Set driver = New SeleniumWrapper.WebDriver
+
+
+driver.Start "chrome", "https://www.google.com"
+
+driver.setImplicitWait 5000
+driver.setTimeout 120000
+driver.windowMaximize
+
+         link = Sheets("sheet1").Cells(2, 1).Value
+         sess = Sheets("sheet1").Cells(2, 2).Value
+       
+         driver.get link
+         
+         'Click on Drop Down
+         driver.findElementByXPath("(//main//button[@aria-label='open menu'])[1]").Click
+         driver.Wait (1000)
+         
+     
+        'Select Option
+          trig = 0
+                      For Each ele In driver.findElementsByXPath("//button[@class='styles__Selector-cdd802-4 jwOUNZ']/following-sibling::ul//li")
+                        
+                        'First Method By attribute
+                        If CStr(ele.getAttribute("title")) = CStr(sess) Then
+                               ele.Click
+                               driver.Wait (1000)
+                        End If
+                        
+                        'Second Method By Index
+                        'trig = trig + 1
+                         '        If trig = 2 Then
+                          '                  ele.Click
+                           '                 driver.Wait (1000)
+                            '       GoTo nxt
+                             '    End If
+                    Next ele
+    
+nxt:
+
+             
+ Shell ("taskkill /im chromedriver.exe /f /t")
+ 
+End Sub
+
+
