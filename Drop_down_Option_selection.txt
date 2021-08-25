@@ -16,8 +16,8 @@ driver.setImplicitWait 5000
 driver.setTimeout 120000
 driver.windowMaximize
 
-         link = Sheets("sheet1").Cells(2, 1).Value
-         sess = Sheets("sheet1").Cells(2, 2).Value
+         link = "https://www.sofascore.com/tournament/football/england/premier-league/17"
+         sess = "20/21"
        
          driver.get link
          
