@@ -1,0 +1,61 @@
+Sub translate()
+
+
+    lang = ActiveSheet.Cells(5, 3).Value
+    
+    If lang = "" Then
+       
+        MsgBox "Enter Translate Language"
+        Exit Sub
+        
+    End If
+    
+    Dim driver As SeleniumWrapper.WebDriver
+    Dim ele As Object
+
+    Dim keys As New SeleniumWrapper.keys
+    Set driver = New SeleniumWrapper.WebDriver
+   
+    
+
+    driver.Start "chrome", "https://www.google.com"
+    
+    driver.setImplicitWait 5000
+    driver.setTimeout 120000
+
+    
+    Dim cell As Object
+   
+    For Each cell In Selection
+    
+     
+       
+       driver.get "https://translate.google.com/?sl=auto&tl=en"
+      
+        For Each ele In driver.findElementsByXPath("//textarea[@aria-label='Source text']")
+            ele.Click
+            ele.SendKeys (ActiveSheet.Cells(cell.Row, cell.Column).Value)
+        Next ele
+        
+        Application.Wait (Now + TimeValue("0:00:03"))
+        
+        txt = driver.Url
+        txt = Right(txt, Len(txt) - InStr(txt, "&text=") - 5)
+        
+        
+        driver.get "https://translate.google.com/?sl=auto&tl=" & lang & "&text=" & txt
+        
+        
+        For Each ele In driver.findElementsByXPath("//span[@jsname='jqKxS']")
+        
+         ActiveSheet.Cells(cell.Row, cell.Column) = ele.Text
+        
+        Next ele
+       
+    Next cell
+    
+    
+ 
+Shell ("taskkill /im chromedriver.exe /f /t")
+End Sub
+
