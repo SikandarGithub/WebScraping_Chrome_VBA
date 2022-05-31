@@ -1,0 +1,140 @@
+Sub get_amazon_data()
+
+
+
+'Get sheet Name
+  country = LCase(ActiveSheet.Name)
+  
+  If country = "uk" Then country = "co.uk"
+  If country = "us" Then country = "com"
+  
+'Get last columns
+   last_col = ActiveSheet.Cells(2, Columns.count).End(xlToLeft).Column
+   
+'Get columns Index
+   For i = 1 To last_col
+   
+     If ActiveSheet.Cells(2, i).Value = "external_product_id" Then pid_c = i
+     If ActiveSheet.Cells(2, i).Value = "item_name" Then item_name_c = i
+    
+  
+     If ActiveSheet.Cells(2, i).Value = "bullet_point1" Then b1_c = i
+     If ActiveSheet.Cells(2, i).Value = "bullet_point2" Then b2_c = i
+     If ActiveSheet.Cells(2, i).Value = "bullet_point3" Then b3_c = i
+     If ActiveSheet.Cells(2, i).Value = "bullet_point4" Then b4_c = i
+     If ActiveSheet.Cells(2, i).Value = "bullet_point5" Then b5_c = i
+     
+     If ActiveSheet.Cells(2, i).Value = "standard_price" Then st_price_c = i
+     If ActiveSheet.Cells(2, i).Value = "lower_price" Then lw_price_c = i
+   Next
+
+
+Dim driver
+Set driver = New SeleniumWrapper.WebDriver
+
+
+driver.Start "chrome", "https://www.google.com"
+
+driver.setImplicitWait 5000
+driver.setTimeout 120000
+
+
+ 
+
+
+
+Dim cell As Object
+   
+   
+
+
+For Each cell In Selection
+  Asin = ActiveSheet.Cells(cell.Row, pid_c).Value
+  
+
+  
+  
+  If Asin <> "" And Left(Trim(Asin), 2) = "B0" Then
+  
+    driver.get "https://www.amazon." & country & "/dp/" & Asin
+      Application.Wait (Now + TimeValue("0:00:10"))
+   
+    
+    
+    'Get Name
+    For Each ele In driver.findElementsByXPath("//h1[@id='title']")
+    
+      ActiveSheet.Cells(cell.Row, item_name_c) = ele.Text
+    
+    Next ele
+    
+    If ActiveSheet.Cells(cell.Row, item_name_c).Value = "" Then
+          ActiveSheet.Cells(cell.Row, item_name_c) = "This ASIN does not exist"
+          GoTo nxt
+    End If
+    
+    
+   'Get Bullets
+   
+   
+    For Each ele In driver.findElementsByXPath("//div[@id='feature-bullets']//li")
+      
+      If ActiveSheet.Cells(cell.Row, b1_c) = "" Then
+         ActiveSheet.Cells(cell.Row, b1_c) = ele.Text
+      Else
+        If ActiveSheet.Cells(cell.Row, b2_c) = "" Then
+            ActiveSheet.Cells(cell.Row, b2_c) = ele.Text
+        Else
+            If ActiveSheet.Cells(cell.Row, b3_c) = "" Then
+               ActiveSheet.Cells(cell.Row, b3_c) = ele.Text
+            Else
+                 If ActiveSheet.Cells(cell.Row, b4_c) = "" Then
+                    ActiveSheet.Cells(cell.Row, b4_c) = ele.Text
+                 Else
+                    If ActiveSheet.Cells(cell.Row, b5_c) = "" Then
+                        ActiveSheet.Cells(cell.Row, b5_c) = ele.Text
+                    End If
+                 End If
+            End If
+        End If
+        
+       
+      
+        
+      End If
+    Next ele
+    
+    ' standard pirce
+    
+    For Each ele In driver.findElementsByXPath("//div[@id='apex_desktop']//span[contains(@class,'riceToPay')]//span[@class='a-offscreen']")
+       ActiveSheet.Cells(cell.Row, st_price_c) = ele.getAttribute("textContent")
+       GoTo lw_price
+    Next ele
+lw_price:
+     ' lower pirce
+    
+    For Each ele In driver.findElementsByXPath("//div[@id='apex_desktop']//span[contains(@class,'bas')]//span[@class='a-offscreen']")
+       ActiveSheet.Cells(cell.Row, lw_price_c) = ele.getAttribute("textContent")
+       
+       GoTo nxt:
+    Next ele
+
+    
+    
+  
+  End If
+nxt:
+Next cell
+
+
+
+
+
+Shell ("taskkill /im chromedriver.exe /f /t")
+
+
+
+
+End Sub
+
+
