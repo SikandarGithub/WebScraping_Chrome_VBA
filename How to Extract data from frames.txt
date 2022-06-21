@@ -1,0 +1,96 @@
+Sub get_Data_from_Frames()
+
+
+
+Dim driver As SeleniumWrapper.WebDriver
+Set driver = New SeleniumWrapper.WebDriver
+
+
+driver.Start "chrome", "https://www.google.com"
+
+driver.setImplicitWait 5000
+driver.setTimeout 12000
+driver.get "https://ixa2.si.ehu.eus/dbe/index4.html"
+      
+
+alpindex = 26
+    
+For i = 51 To 54
+
+     driver.switchToFrame "alphabethframe"
+
+    alp = 0
+    
+  
+    
+   
+    'Get Alphabet
+    For Each ele In driver.findElementsByXPath("//table[@class='alphabeth']//td/a")
+         alp = alp + 1
+         
+         If alp = alpindex Then
+           ele.Click
+           Application.Wait (Now + TimeValue("0:00:05"))
+         End If
+
+    Next ele
+    
+    
+    For Each hd In driver.WindowHandles
+          driver.switchToWindow hd
+    Next hd
+        
+    
+    driver.switchToFrame "entryframe"
+    
+  
+    rw = 2
+
+          
+
+
+    For Each ele In driver.findElementsByXPath("//select[@name='entries']/option")
+            
+           ele.Click
+    
+           ActiveSheet.Cells(rw, i) = ele.Text
+           
+           For Each hd In driver.WindowHandles
+             driver.switchToWindow hd
+           Next hd
+           
+           driver.switchToFrame "contentframe"
+           
+           ActiveSheet.Cells(rw, i + 1) = driver.findElementByXPath("//body").Text
+            
+            
+           
+           rw = rw + 1
+           
+           For Each hd In driver.WindowHandles
+               driver.switchToWindow hd
+           Next hd
+           
+           driver.switchToFrame "entryframe"
+
+     Next ele
+nxt:
+      
+    For Each hd In driver.WindowHandles
+          driver.switchToWindow hd
+    Next hd
+        
+
+   i = i + 1
+   alpindex = alpindex + 1
+
+Next i
+
+Shell ("taskkill /im chromedriver.exe /f /t")
+
+
+
+
+End Sub
+
+
